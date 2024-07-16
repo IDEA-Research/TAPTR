@@ -44,6 +44,36 @@ To evaluate the tracking speed of different methods fairly, we compare the Point
 <img src="assets/ablation2.png">
 As a baseline method, as shown in the tables, we provide extensive ablation studies to verify the effectiveness of each key component in TAPTR, providing references for future work.
 
+# :gear: Usage 
+We develop and test our method under ```python=3.8.13,pytorch=1.9.1,cuda=11.1```. Other versions might be available as well.
+
+## Prepare datasets
+Construct the dataset as in [CoTracker](https://github.com/facebookresearch/co-tracker), and put it at 
+```
+kubric data (for training): ./data/kubric_movif/
+tapvid data (for evaluation): 
+    ./data/tapvid/tapvid_davis
+    ./data/tapvid/tapvid_kinetics
+    ./data/tapvid/tapvid_rgb_stacking
+```
+
+## Installation
+```sh
+git https://github.com/IDEA-Research/TAPTR.git
+cd TAPTR/
+```
+
+## Eval our pretrianed models
+Download our provided [checkpoint](), and put it at "logs/TAPTR/taptr.pth"
+```sh
+# Select the dataset you want to evaluate in evaluate.sh manually. 
+bash evaluate.sh
+```
+## Train the models
+```sh
+bash dist_train.sh
+```
+
 # :black_nib: Citation
 
 ```
