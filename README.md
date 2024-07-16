@@ -69,6 +69,15 @@ Download our provided [checkpoint](https://drive.google.com/file/d/1sb4BXpCsYe6a
 # Select the dataset you want to evaluate in evaluate.sh manually. 
 bash evaluate.sh
 ```
+
+## Demos
+```sh
+# Point Trajectory Demo
+CUDA_VISIBLE_DEVICES=0 python demo_inter.py -c config/TAPTR.py --path_ckpt logs/TAPTR/taptr.pth
+# Video Editing Demo
+CUDA_VISIBLE_DEVICES=0 python demo_inter_video_editing.py -c config/TAPTR.py --path_ckpt logs/TAPTR/taptr.pth
+```
+
 ## Train the models
 ```sh
 bash dist_train.sh
