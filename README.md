@@ -64,7 +64,7 @@ cd TAPTR/
 ```
 
 ## Eval our pretrianed models
-Download our provided [checkpoint](), and put it at "logs/TAPTR/taptr.pth"
+Download our provided [checkpoint](https://drive.google.com/file/d/1sb4BXpCsYe6au_2a1M77tapdkodh48Rm/view?usp=share_link), and put it at "logs/TAPTR/taptr.pth"
 ```sh
 # Select the dataset you want to evaluate in evaluate.sh manually. 
 bash evaluate.sh
