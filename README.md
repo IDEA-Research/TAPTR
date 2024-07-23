@@ -83,7 +83,7 @@ CUDA_VISIBLE_DEVICES=0 python demo_inter_video_editing.py -c config/TAPTR.py --p
 bash dist_train.sh
 ```
 
-## Acknowledgments
+# :herb: Acknowledgments
 We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and [Co-Tracker](https://github.com/facebookresearch/co-tracker) for publicly releasing their code and data. 
 
 # :black_nib: Citation
