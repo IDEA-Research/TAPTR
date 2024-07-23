@@ -929,7 +929,7 @@ class TransformerDecoder(nn.Module):
                 len_temporal = None,
                 freeze_first_frame=False,
                 update_mask=None,
-                history_tgt_list = None,
+                # history_tgt_list = None,
                 ):
         """
         Input:
@@ -1022,7 +1022,7 @@ class TransformerDecoder(nn.Module):
                     len_temporal = len_temporal,
                     corr_block = self.corr_block,
                     corr_block_2 = self.corr_block_2,
-                    history_tgt_list = history_tgt_list,
+                    # history_tgt_list = history_tgt_list,
                 )
 
             # iter update
@@ -1148,8 +1148,7 @@ class DeformableTransformerDecoderLayer(nn.Module):
                  ):
         super().__init__()
         self.module_seq = module_seq
-        assert (sorted(module_seq) == ['ca', 'ffn', 'sa', 'tsa']) or (sorted(module_seq) == ['ca', 'ffn', 'sa']) or (sorted(module_seq) == ['ca', 'dca', 'ffn', 'sa', 'tsa']) or (sorted(module_seq) == ['dca', 'ffn', 'sa', 'tsa']) \
-                or (sorted(module_seq) == ['ca', 'ffn', 'ha', 'sa', 'tsa']) or (sorted(module_seq) == ['ca', 'ffn', 'hmva', 'sa', 'tsa'])
+        assert (sorted(module_seq) == ['ca', 'ffn', 'sa', 'tsa']) or (sorted(module_seq) == ['ca', 'ffn', 'sa'])
         # cross attention
         if "ca" in module_seq:
             if use_deformable_box_attn:
@@ -1319,45 +1318,6 @@ class DeformableTransformerDecoderLayer(nn.Module):
 
         return tgt
 
-    def forward_dca(self,
-            # for tgt
-            tgt: Optional[Tensor],  # nq, bs, d_model
-            tgt_query_pos: Optional[Tensor] = None, # pos for query. MLP(Sine(pos))
-            tgt_query_sine_embed: Optional[Tensor] = None, # pos for query. Sine(pos)
-            tgt_key_padding_mask: Optional[Tensor] = None,
-            tgt_reference_points: Optional[Tensor] = None, # nq, bs, 4
-
-            # for memory
-            memory: Optional[Tensor] = None, # hw, bs, d_model
-            memory_key_padding_mask: Optional[Tensor] = None,
-            memory_level_start_index: Optional[Tensor] = None, # num_levels
-            memory_spatial_shapes: Optional[Tensor] = None, # bs, num_levels, 2
-            memory_pos: Optional[Tensor] = None, # pos for memory
-
-            # sa
-            self_attn_mask: Optional[Tensor] = None, # mask used for self-attention
-            cross_attn_mask: Optional[Tensor] = None, # mask used for cross-attention
-        ):
-        memory_sel = []
-        memory_pos_sel = []
-        memory_key_padding_mask_sel = []
-        for level in self.dense_levels:
-            start_idx = memory_level_start_index[level]
-            end_idx = start_idx + memory_spatial_shapes[level].cumprod(dim=0)[-1]
-            memory_sel.append(memory[start_idx: end_idx])
-            memory_pos_sel.append(memory_pos[start_idx: end_idx])
-            memory_key_padding_mask_sel.append(memory_key_padding_mask[:, start_idx: end_idx])
-        memory_sel = torch.cat(memory_sel, dim=0)
-        memory_pos_sel = torch.cat(memory_pos_sel, dim=0)
-        memory_key_padding_mask_sel = torch.cat(memory_key_padding_mask_sel, dim=1)
-
-        tgt2 = self.dense_cross_attn(self.with_pos_embed(tgt, tgt_query_pos),
-                            self.with_pos_embed(memory_sel, memory_pos_sel), memory_sel, memory_key_padding_mask_sel)[0]
-        tgt = tgt + self.dropout_dca(tgt2)
-        tgt = self.norm_dca(tgt)
-
-        return tgt
-
     def forward_tsa(self,
         # for tgt
         tgt: Optional[Tensor],  # nq, bs, d_model
@@ -1405,43 +1365,6 @@ class DeformableTransformerDecoderLayer(nn.Module):
                 raise NotImplementedError("Unknown decoder_sa_type {}".format(self.decoder_sa_type))
 
         return tgt
-    
-    def forward_ha(self,
-        # for tgt
-        tgt: Optional[Tensor],  # nq, bs*len_temp, d_model
-        history_tgt_list,  # n_his [nq bs d_model]
-        len_temporal,
-    ):
-        num_query, bs_len, _ = tgt.shape
-        query = tgt.flatten(0,1)[None, ...]  # 1, nq*bs*len_temp, c
-        key = torch.stack(history_tgt_list, 0)  # n_his nq bs d_model]
-        key = key.unsqueeze(3).repeat(1,1,1,len_temporal,1)  # n_his, nq, bs, len_temp, d_model
-        key = key.flatten(1,3)  # n_his, nq*bs*len_temp, c
-        value = key
-        tgt2 = self.history_attention(query, key, value)[0]  # 1, nq*bs*len_temp, c
-        tgt2 = tgt2.squeeze(0).view(num_query, bs_len, -1)
-        tgt = tgt + self.dropout_ha(tgt2)
-        tgt = self.norm_ha(tgt)
-        return tgt
-    
-    def forward_hmva(self,
-        # for tgt
-        tgt: Optional[Tensor],  # nq, bs*len_temp, d_model
-        history_tgt_list,  # n_his [nq bs d_model]
-        len_temporal,
-    ):
-        history = torch.stack(history_tgt_list, 0)  # n_his nq bs d_model]
-        mean_history = history.mean(0)  # nq bs d_model
-        if len(history_tgt_list) > 1:
-            var_history = history.var(0)  # nq bs d_model
-        else:
-            var_history = torch.zeros_like(mean_history)
-        history = torch.cat([mean_history, var_history], -1)  # nq bs 2*d_model
-        history = history[:, :, None].repeat(1, 1, len_temporal, 1).flatten(1,2)  # nq bs len_temp 2*d_model  -->  nq bs*len_temp 2*d_model
-        tgt_delta = self.history_mean_var_attention(torch.cat([tgt, history], dim=-1))  # nq bs*len_temp 3*d_model
-        tgt = tgt + tgt_delta
-        tgt = self.norm_hmva(tgt)
-        return tgt
 
     def forward(self,
                 # for tgt
@@ -1470,9 +1393,6 @@ class DeformableTransformerDecoderLayer(nn.Module):
                 # corr
                 corr_block = None, 
                 corr_block_2 = None, 
-
-                # history attention
-                history_tgt_list = None,
             ):
         # corr
         if self.add_corr_block:
@@ -1489,11 +1409,6 @@ class DeformableTransformerDecoderLayer(nn.Module):
                     tgt_key_padding_mask, tgt_reference_points, \
                         memory, memory_key_padding_mask, memory_level_start_index, \
                             memory_spatial_shapes, memory_pos, self_attn_mask, cross_attn_mask)
-            elif funcname == 'dca':
-                tgt = self.forward_dca(tgt, tgt_query_pos, tgt_query_sine_embed, \
-                    tgt_key_padding_mask, tgt_reference_points, \
-                        memory, memory_key_padding_mask, memory_level_start_index, \
-                            memory_spatial_shapes, memory_pos, self_attn_mask, cross_attn_mask)
             elif funcname == 'sa':
                 tgt = self.forward_sa(tgt, tgt_query_pos, tgt_query_sine_embed, \
                     tgt_key_padding_mask, tgt_reference_points, \
@@ -1504,10 +1419,6 @@ class DeformableTransformerDecoderLayer(nn.Module):
                     tgt_key_padding_mask, tgt_reference_points, \
                         memory, memory_key_padding_mask, memory_level_start_index, \
                             memory_spatial_shapes, memory_pos, temp_self_attn_mask, temp_cross_attn_mask, len_temporal)
-            elif funcname == 'ha':
-                tgt = self.forward_ha(tgt, history_tgt_list, len_temporal)
-            elif funcname == 'hmva':
-                tgt = self.forward_hmva(tgt, history_tgt_list, len_temporal)
             else:
                 raise ValueError('unknown funcname {}'.format(funcname))
         return tgt
@@ -1551,136 +1462,6 @@ class DeformableTransformerDecoderLayer(nn.Module):
             pe = torch.cat([xy, pe], dim=2)  # (B, N, C*3+3)
         return pe
     
-
-class GlobalTransformerDecoderLayer(DeformableTransformerDecoderLayer):
-    def __init__(self, d_model=256, d_ffn=1024, dropout=0.1, activation="relu", n_levels=4, n_heads=8, n_points=4, use_deformable_box_attn=False, box_attn_type='roi_align', key_aware_type=None, decoder_sa_type='ca', module_seq=['sa', 'ca', 'ffn'], global_corr_once=False):
-        super().__init__(d_model, d_ffn, dropout, activation, n_levels, n_heads, n_points, use_deformable_box_attn, box_attn_type, key_aware_type, decoder_sa_type, module_seq)
-        # do not need deformable attention for cross attention
-        self.cross_attn = None
-        self.dropout1 = None
-        self.norm1 = None
-        # do not need self attention
-        self.self_attn = None
-        self.dropout2 = None
-        self.norm2 = None
-        if "tsa" in module_seq:
-            self.temp_self_attn = nn.MultiheadAttention(d_model, n_heads, dropout=dropout)
-            self.dropout_temp = nn.Dropout(dropout)
-            self.norm_temp = nn.LayerNorm(d_model)
-        # module_seq_filted = []
-        # for module_ in self.module_seq:
-        #     if module_ in ["tsa", "ca", "ffn"]:
-        #         module_seq_filted.append(module_)
-        # self.module_seq = module_seq_filted
-        self.module_seq = ["ca", "tsa", "ffn"]
-
-        self.corr_once = global_corr_once
-        if self.corr_once:
-            self.corr_fuser = None
-            self.corr_query_proj = None
-        else:
-            self.corr_query_proj = nn.Sequential(*[
-                nn.Linear(d_model, d_model),
-                nn.ReLU(),
-                nn.Linear(d_model, d_model),
-            ])
-        self.corr_fuser = nn.Sequential(*[
-            nn.Linear(d_model + (3*2+1)**2*4, d_model),
-            nn.ReLU(),
-            nn.Linear(d_model, d_model),
-        ])
-    
-    def forward(self,
-                # for tgt
-                tgt: Optional[Tensor],  # nq, bs, d_model
-                tgt_query_pos: Optional[Tensor] = None, # pos for query. MLP(Sine(pos))
-                tgt_query_sine_embed: Optional[Tensor] = None, # pos for query. Sine(pos)
-                tgt_key_padding_mask: Optional[Tensor] = None,
-                tgt_reference_points: Optional[Tensor] = None, # nq, bs, 4
-
-                # for memory
-                memory: Optional[Tensor] = None, # hw, bs, d_model
-                memory_key_padding_mask: Optional[Tensor] = None,
-                memory_level_start_index: Optional[Tensor] = None, # num_levels
-                memory_spatial_shapes: Optional[Tensor] = None, # bs, num_levels, 2
-                memory_pos: Optional[Tensor] = None, # pos for memory
-
-                # sa
-                self_attn_mask: Optional[Tensor] = None, # mask used for self-attention
-                cross_attn_mask: Optional[Tensor] = None, # mask used for cross-attention
-
-                # tsa
-                len_temporal = None,
-                temp_self_attn_mask = None,
-                temp_cross_attn_mask = None,
-
-                # corr
-                corr_block = None, 
-                corr_block_2 = None, 
-
-                # history attention
-                history_tgt_list = None,
-            ):
-        for funcname in self.module_seq:
-            if funcname == 'ffn':
-                tgt = self.forward_ffn(tgt)
-            elif funcname == 'ca':
-                tgt = self.forward_ca(tgt, tgt_query_pos, tgt_query_sine_embed, \
-                    tgt_key_padding_mask, tgt_reference_points, \
-                        memory, memory_key_padding_mask, memory_level_start_index, \
-                            memory_spatial_shapes, memory_pos, self_attn_mask, cross_attn_mask, corr_block)
-            elif funcname == 'dca':
-                tgt = self.forward_dca(tgt, tgt_query_pos, tgt_query_sine_embed, \
-                    tgt_key_padding_mask, tgt_reference_points, \
-                        memory, memory_key_padding_mask, memory_level_start_index, \
-                            memory_spatial_shapes, memory_pos, self_attn_mask, cross_attn_mask)
-            elif funcname == 'sa':
-                tgt = self.forward_sa(tgt, tgt_query_pos, tgt_query_sine_embed, \
-                    tgt_key_padding_mask, tgt_reference_points, \
-                        memory, memory_key_padding_mask, memory_level_start_index, \
-                            memory_spatial_shapes, memory_pos, self_attn_mask, cross_attn_mask)
-            elif funcname == 'tsa':
-                tgt = self.forward_tsa(tgt, tgt_query_pos, tgt_query_sine_embed, \
-                    tgt_key_padding_mask, tgt_reference_points, \
-                        memory, memory_key_padding_mask, memory_level_start_index, \
-                            memory_spatial_shapes, memory_pos, temp_self_attn_mask, temp_cross_attn_mask, len_temporal)
-            elif funcname == 'ha':
-                tgt = self.forward_ha(tgt, history_tgt_list, len_temporal)
-            elif funcname == 'hmva':
-                tgt = self.forward_hmva(tgt, history_tgt_list, len_temporal)
-            else:
-                raise ValueError('unknown funcname {}'.format(funcname))
-
-        return tgt
-
-    def forward_ca(self,
-                # for tgt
-                tgt: Optional[Tensor],  # nq, bs, d_model
-                tgt_query_pos: Optional[Tensor] = None, # pos for query. MLP(Sine(pos))
-                tgt_query_sine_embed: Optional[Tensor] = None, # pos for query. Sine(pos)
-                tgt_key_padding_mask: Optional[Tensor] = None,
-                tgt_reference_points: Optional[Tensor] = None, # nq, bs, 4
-
-                # for memory
-                memory: Optional[Tensor] = None, # hw, bs, d_model
-                memory_key_padding_mask: Optional[Tensor] = None,
-                memory_level_start_index: Optional[Tensor] = None, # num_levels
-                memory_spatial_shapes: Optional[Tensor] = None, # bs, num_levels, 2
-                memory_pos: Optional[Tensor] = None, # pos for memory
-
-                # sa
-                self_attn_mask: Optional[Tensor] = None, # mask used for self-attention
-                cross_attn_mask: Optional[Tensor] = None, # mask used for cross-attention
-                corr_block = None
-            ):
-        if not self.corr_once:
-            corr_block.corr(self.corr_query_proj(tgt))
-        fcorrs = corr_block.sample(tgt_reference_points[:,:,0][..., :2])
-        tgt = torch.cat([tgt, fcorrs], -1)
-        tgt = self.corr_fuser(tgt)
-
-        return tgt
-
 
 def _get_clones(module, N, layer_share=False):
     if layer_share:

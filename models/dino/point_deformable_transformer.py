@@ -164,7 +164,6 @@ class PointDeformableTransformer(DeformableTransformer):
             mask_flatten, valid_ratios, 
             multi_task_tgt, multi_task_pos_embed, multi_task_corr_tgt,
             len_temporal, temp_tgt_mask, tgt_mask, update_mask,
-            history_tgt_list,
         ):
         #########################################################
         # Begin Decoder
@@ -180,7 +179,7 @@ class PointDeformableTransformer(DeformableTransformer):
                 spatial_shapes=spatial_shapes,
                 valid_ratios=valid_ratios, temp_tgt_mask=temp_tgt_mask, tgt_mask=tgt_mask,
                 len_temporal=len_temporal, freeze_first_frame=True, update_mask=update_mask,
-                history_tgt_list=history_tgt_list)
+                )
         #########################################################
         # End Decoder
         # hs: n_dec, bs, nq, d_model
@@ -365,7 +364,7 @@ def build_point_deformable_transformer(args):
         decoder_query_perturber=RandomBoxPerturber(
                 x_noise_scale=args.dln_xy_noise, y_noise_scale=args.dln_xy_noise, 
                 w_noise_scale=args.dln_hw_noise, h_noise_scale=args.dln_hw_noise)
-
+    # TODO: Global-related code is disenabled. Clean Global-related code.
     use_detached_boxes_dec_out = getattr(args, "use_detached_boxes_dec_out", False)
     rm_detach = getattr(args, "rm_detach", None)
     rm_self_attn_layers = getattr(args, "rm_self_attn_layers", None)

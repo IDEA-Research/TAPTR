@@ -23,7 +23,6 @@ from .utils import sigmoid_focal_loss, MLP
 from ..registry import MODULE_BUILD_FUNCS
 from .dn_components import prepare_for_cdn,dn_post_process
 import time
-
 from models.dino.dino import DINO, SetCriterion, PostProcess
 
 
@@ -378,11 +377,10 @@ class TAPTR(DINO):
                 self.long_video_mode = False
         else:  # training path
             memory, lvl_pos_embed_flatten, level_start_index, spatial_shapes, mask_flatten, valid_ratios = self.prepare_video_features(samples)
-        #! 2. Prepare the initial states the point queries (ptq). Use the states when their belonging points first emerge to initialize their states.
+        #! 2. Prepare the initial states of the point queries (ptq). Use the states when their belonging points first emerge or start to be tracked to initialize their states.
         ptq_tracking_masks, ptq_start_tracking_frames, ptq_updating_masks, \
         ptq_initial_traj_location, ptq_initial_traj_visibility, ptq_group_mask = self.prepare_point_initial_states(targets, batch_size, len_temporal)
-        # TODO: wash transformer.
-        # sampling image features as point queries' initial content features and locations (inverse sigmoid). 
+        # Get the initial states of each point's whole trajectory. Sampling image features as point queries' initial content features and locations (inverse sigmoid). 
         ptq_current_traj_features, ptq_current_traj_embeds, ptq_current_traj_visibility = self.transformer.prepare_point_query(
             memory, lvl_pos_embed_flatten, mask_flatten, level_start_index, spatial_shapes, 
             ptq_initial_traj_location[..., :2], ptq_initial_traj_visibility, ptq_start_tracking_frames
@@ -402,9 +400,9 @@ class TAPTR(DINO):
         window_output_list = []
         window_target_list = []
 
-        history_hs_list = [ptq_current_traj_features[:, 0].transpose(0,1)]  # bs, num_q, C
         window_ids = list(range(num_windows))
         for window_id in window_ids:
+            # Window preparation.
             self.window_id = window_id
             window_head, window_tail = self.get_window_range(window_id, len_temporal)
             window_memory, window_lvl_pos_embed_flatten, window_mask_flatten, window_valid_ratio, \
@@ -421,15 +419,14 @@ class TAPTR(DINO):
             )
             if window_memory is None:
                 continue  # no points should be updated in the window.
-            # 4. Forward each window.
+            # Forward each window.
             hs, reference, _, _ = self.transformer.forward_pt_tracking_decoder(
                 window_memory, window_lvl_pos_embed_flatten, level_start_index, spatial_shapes, 
                 window_mask_flatten, window_valid_ratio,
                 ptq_window_feature, ptq_window_embed, ptq_window_traj_corr_feature,
                 self.sliding_window_size, window_temp_attn_mask, window_self_attn_mask, window_update_mask,
-                history_hs_list, 
             )
-            # 5. Get decoder output.
+            # Get decoder output.
             outputs_coord_list = []
             for dec_lid, (layer_ref_sig, layer_bbox_embed, layer_hs) in enumerate(zip(reference[:-1], self.bbox_embed, hs)):
                 layer_delta_unsig = layer_bbox_embed(layer_hs)
@@ -444,11 +441,16 @@ class TAPTR(DINO):
                 elif self.mode_class_feat == "diff_init":
                     outputs_class.append(layer_cls_embed(layer_hs - ptq_window_feature))
             outputs_class = torch.stack(outputs_class)
-            # 6. Update the query states.
-            ptq_current_traj_embeds, ptq_current_traj_visibility, ptq_current_traj_features = self.update_query_states(window_head, window_tail, window_update_mask, ptq_current_traj_embeds, ptq_current_traj_visibility, ptq_current_traj_features, ptq_initial_traj_features, outputs_coord_list, outputs_class, hs, padding_to_future=window_id<(num_windows-1))
-            # transform query states into the readable format.
-            outputs_coord_list = outputs_coord_list.sigmoid()
-            # 7. Prepare for the window loss.
+            # Update the point-query states.
+            ptq_current_traj_embeds, ptq_current_traj_visibility, ptq_current_traj_features = self.update_query_states(
+                window_head, window_tail, 
+                window_update_mask, ptq_current_traj_embeds, ptq_current_traj_visibility, ptq_current_traj_features, 
+                ptq_initial_traj_features, 
+                outputs_coord_list, outputs_class, hs, 
+                padding_to_future=window_id<(num_windows-1)
+            )
+            outputs_coord_list = outputs_coord_list.sigmoid()  # transform query states into the readable format.
+            # Prepare for the window loss.
             if self.training:
                 window_output, window_target = self.prepare_window_loss(outputs_class, outputs_coord_list, targets, window_head, window_tail, window_update_mask)
                 window_output_list.append(window_output)
@@ -542,7 +544,6 @@ class PointTrackingCriterion(SetCriterion):
 
     def forward(self, outputs, targets, return_indices=False):
         losses = {}
-
         # Full sequence loss
         outputs_full_seq = outputs["full_seq_output"]
         targets_full_seq = self.align_gt_point2box(targets["full_seq_target"])
@@ -727,17 +728,6 @@ def get_weight_dict(args):
 
 def get_criterions(args, device, weight_dict):
     losses = []
-    if args.masks:
-        losses += ["masks"]
-    if args.activate_det_seg:
-        matcher = build_matcher(args)
-        criterion = SetCriterion(args.num_classes, matcher=matcher, weight_dict=weight_dict,
-                                focal_alpha=args.focal_alpha, losses=['labels', 'boxes'],
-                            )
-        criterion.to(device)
-        losses += ['labels', 'boxes']
-    else:
-        criterion = None
     if args.activate_point_tracking:
         losses += args.pt_losses # ['pt_boxes', 'pt_visibs']  # 'pt_label', 
         pt_criterion = PointTrackingCriterion(num_classes=args.num_classes, weight_dict=weight_dict, 
@@ -745,7 +735,7 @@ def get_criterions(args, device, weight_dict):
         pt_criterion.to(device)
     else:
         pt_criterion = None
-    return criterion, pt_criterion
+    return None, pt_criterion
 
 
 @MODULE_BUILD_FUNCS.registe_with_name(module_name='taptr')
@@ -767,7 +757,6 @@ def build_taptr(args):
 
     dec_pred_class_embed_share = getattr(args, "dec_pred_class_embed_share", True)
     dec_pred_bbox_embed_share = getattr(args, "dec_pred_bbox_embed_share", True)
-    # match_unstable_error = getattr(args, "match_unstable_error", True)
     dn_labelbook_size = getattr(args, "dn_labelbook_size", num_classes)
     pointquery_position_initialize_mode = getattr(args, "pointquery_position_initialize_mode", "padding_newest")
     point_size_initialize_value = getattr(args, "point_size_initialize_value", 0.5)
@@ -829,18 +818,5 @@ def build_taptr(args):
     }
     
     postprocessors = {'bbox': PostProcess(num_select=args.num_select, nms_iou_threshold=args.nms_iou_threshold)}
-    if args.masks:
-        postprocessors['segm'] = PostProcessSegm()
-        if args.dataset_file == "coco_panoptic":
-            is_thing_map = {i: i <= 90 for i in range(201)}
-            postprocessors["panoptic"] = PostProcessPanoptic(is_thing_map, threshold=0.85)
-
+    
     return model, criterions, postprocessors
-
-
-def get_sub_weight_dict(weight_dict, names):
-    sub_weight_dict = {}
-    for name in names:
-        if name in weight_dict.keys():
-            sub_weight_dict[name] = weight_dict[name]
-    return sub_weight_dict
