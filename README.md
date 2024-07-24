@@ -7,7 +7,7 @@ By [Hongyang Li](https://scholar.google.com.hk/citations?view_op=list_works&hl=z
 [![VideoEdit_PointTrajectory](assets/combine_video_coverimage.png)](https://github.com/IDEA-Research/TAPTR/assets/89394032/036503fe-bb4c-4804-affc-c606fd93878f)
 
 # :fire: News
-[2024/7/24] TAPTRv2 is released, check out our paper for more detail!
+[2024/7/24] TAPTRv2 is released, check out our paper for more details!
 
 [2024/7/16] Training, evaluation, and demo codes have been released but have not been cleaned yet. Hope these codes can be helpful to you. 
 
