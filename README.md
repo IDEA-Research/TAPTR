@@ -2,10 +2,13 @@
 
 By [Hongyang Li](https://scholar.google.com.hk/citations?view_op=list_works&hl=zh-CN&user=zdgHNmkAAAAJ&gmla=AMpAcmTJNHoetv6zgfzZkIRcYsFr0UkGGDyl5tAp5etuBqhz3lzYZCQrVDot02xVQ1XTbnMS1fPdAfe0-2--aTXOtewokjyShNLOQQyyhtkolwaz0hvENZpi-pJ-Wg), [Hao Zhang](https://scholar.google.com/citations?user=B8hPxMQAAAAJ&hl=zh-CN), [Shilong Liu](https://scholar.google.com/citations?hl=zh-CN&user=nkSVY3MAAAAJ), [Zhaoyang Zeng](https://scholar.google.com.hk/citations?user=U_cvvUwAAAAJ&hl=zh-CN&oi=sra), [Tianhe Ren](https://scholar.google.com.hk/citations?user=cW4ILs0AAAAJ&hl=zh-CN&oi=sra), [Feng Li](https://scholar.google.com.hk/citations?user=ybRe9GcAAAAJ&hl=zh-CN&oi=sra), and [Lei Zhang](https://scholar.google.com/citations?hl=zh-CN&user=fIlGZToAAAAJ) <sup>:email:</sup>.
 
-### [Project Page](https://taptr.github.io) | [Demo-PointTrajectory](https://taptr-trajectory.deepdataspace.com) | [Demo-VideoEditing](https://taptr-videoediting.deepdataspace.com) | [Arxiv](https://arxiv.org/abs/2403.13042) | [BibTeX](#citing-taptr)
+### [Project Page](https://taptr.github.io) | [Demo-PointTrajectory](https://taptr-trajectory.deepdataspace.com) | [Demo-TrackAnyArea](https://taptr-videoediting.deepdataspace.com)
+### [Arxiv-TAPTR](https://arxiv.org/abs/2403.13042) | [Arxiv-TAPTRv2](https://arxiv.org/abs/2403.13042) | [BibTeX](#citing-taptr)
 [![VideoEdit_PointTrajectory](assets/combine_video_coverimage.png)](https://github.com/IDEA-Research/TAPTR/assets/89394032/036503fe-bb4c-4804-affc-c606fd93878f)
 
 # :fire: News
+[2024/7/24] TAPTRv2 is released, check out our paper for more detail!
+
 [2024/7/16] Training, evaluation, and demo codes have been released but have not been cleaned yet. Hope these codes can be helpful to you. 
 
 [2024/7/9] TAPTR is accepted by ECCV2024.
@@ -96,6 +99,13 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
   title={TAPTR: Tracking Any Point with Transformers as Detection},
   author={Hongyang Li and Hao Zhang and Shilong Liu and Zhaoyang Zeng and Tianhe Ren and Feng Li and Lei Zhang},
   booktitle={Proceedings of the IEEE/CVF European Conference on Computer Vision},
+  year={2024}
+}
+@inproceedings{
+  title={TAPTRv2: Attention-based Position Update Improves Tracking Any Point},
+  author={Hongyang Li and Hao Zhang and Shilong Liu and Zhaoyang Zeng and Feng Li and Tianhe Ren and Bohan Li and Lei Zhang},
+  journal={arXiv preprint arXiv:2407.16291
+  },
   year={2024}
 }
 ```
