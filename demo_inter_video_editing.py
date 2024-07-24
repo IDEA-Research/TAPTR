@@ -356,7 +356,8 @@ def draw_tracks_on_video(
     else:
         # color changes with time
         for t in range(T):
-            color = np.array(color_map(t / T)[:3])[None] * 255
+            # color = np.array(color_map(t / T)[:3])[None] * 255
+            color = np.array(color_map(t)[:3])[None] * 255
             vector_colors[t] = np.repeat(color, N, axis=0)
     
     point_size = 1
@@ -536,8 +537,8 @@ def process_one_video(input_video, frame, interaction):
 with gr.Blocks(title="TAPTR") as demo:
     title_markdown = ("""
         # TAPTR: **T**racking **A**ny **P**oint with **TR**ansformer as Detection
-        ### Video Editing Demo [[PointTrajectory Demo]](https://taptr-trajectory.deepdataspace.com)
-        [[Project Page]](https://taptr.github.io) [[Paper]](https://arxiv.org/abs/2403.13042) [[Code (Coming Soon)]](https://github.com/IDEA-Research/TAPTR)
+        ### Area Tracking Demo [[PointTrajectory Demo]](https://taptr-trajectory.deepdataspace.com)
+        [[Project Page]](https://taptr.github.io) [[Paper-TAPTR]](https://arxiv.org/abs/2403.13042)  [[Paper-TAPTRv2]](https://arxiv.org/abs/2407.16291) [[Code]](https://github.com/IDEA-Research/TAPTR)
     """)
     tips = ("""
         **Usage** \\
@@ -559,7 +560,7 @@ with gr.Blocks(title="TAPTR") as demo:
     gr.Markdown(title_markdown)
     with gr.Row():
         with gr.Column(scale=0.5):
-            input_video = gr.Video(label="Input Video", height=300)
+            input_video = gr.Video(label="Input Video", height=400)
             frame_selector = gr.Slider(minimum=0, maximum=700, value=0, label="Frame Selector")
             submit_btn = gr.Button("Submit")
             if os.path.exists("./assets/example_videos/Box.mp4"):
@@ -581,7 +582,7 @@ with gr.Blocks(title="TAPTR") as demo:
                 example_video = gr.Video(label="Usage", height=250, value="./assets/VideoEditing.mp4")
                 gr.Markdown(tips)
         with gr.Column():
-            interaction = gr.ImageMask(label="Interaction", type='numpy', interactive=True, height=650)
+            interaction = gr.ImageMask(label="Interaction", type='numpy', interactive=True, height=800)
             output_video = gr.Video(label="Out Video", height=650)
     input_video.change(fn=video_to_interaction, inputs=[input_video, frame_selector], outputs=[interaction])
     frame_selector.change(fn=video_to_interaction, inputs=[input_video, frame_selector], outputs=[interaction])

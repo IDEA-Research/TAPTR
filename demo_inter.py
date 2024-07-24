@@ -435,8 +435,8 @@ def process_one_video(input_video, frame, interaction):
 with gr.Blocks(title="TAPTR") as demo:
     title_markdown = ("""
         # TAPTR: **T**racking **A**ny **P**oint with **TR**ansformer as Detection
-        ### Point Trajectory Demo [[VideoEditing Demo]](https://taptr-videoediting.deepdataspace.com) 
-        [[Project Page]](https://taptr.github.io) [[Paper]](https://arxiv.org/abs/2403.13042) [[Code (Coming Soon)]](https://github.com/IDEA-Research/TAPTR)
+        ### Point Trajectory Demo [[TrackAnyArea Demo]](https://taptr-videoediting.deepdataspace.com) 
+        [[Project Page]](https://taptr.github.io) [[Paper-TAPTR]](https://arxiv.org/abs/2403.13042) [[Paper-TAPTRv2]](https://arxiv.org/abs/2407.16291) [[Code]](https://github.com/IDEA-Research/TAPTR)
     """)
     tips = ("""
         **Usage** \\
@@ -479,7 +479,7 @@ with gr.Blocks(title="TAPTR") as demo:
                 usage_video = gr.Video(label="Usage", height=250, value="./assets/PointTracking.mp4")
                 gr.Markdown(tips)
         with gr.Column():
-            interaction = ImagePrompter(label="Interaction", interactive=True, height=650)
+            interaction = ImagePrompter(label="Interaction", interactive=True, height=600)
             output_video = gr.Video(label="Output Video", height=650)
     input_video.change(fn=video_to_interaction, inputs=[input_video, frame_selector], outputs=[interaction])
     frame_selector.change(fn=video_to_interaction, inputs=[input_video, frame_selector], outputs=[interaction])
@@ -491,6 +491,6 @@ if __name__ == "__main__":
     global DemoCore
     args = get_args()
     DemoCore = Demo(args)
-    demo.launch(server_name="0.0.0.0", server_port=10003)
+    demo.launch(server_name="0.0.0.0", server_port=10004)
 
 # CUDA_VISIBLE_DEVICES=0 python demo_inter.py -c config/TAPTR.py --path_ckpt logs/TAPTR/taptr.pth
