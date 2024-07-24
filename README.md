@@ -41,7 +41,7 @@ The video preparation and query preparation parts provide the multi-scale featur
 
 # Performance
 <img src="assets/performance.png">
-We evaluate TAPTR on the TAP-Vid benchmark to show its superiority. As shown in the tabel, TAPTR shows significant superiority compared with previous SoTA methods across the majority of metrics while maintins the advantage in inference speed.
+We evaluate TAPTR on the TAP-Vid benchmark to show its superiority. As shown in the table, TAPTR shows significant superiority compared with previous SoTA methods across the majority of metrics while maintains the advantage in inference speed.
 To evaluate the tracking speed of different methods fairly, we compare the Point Per Second (PPS), which is the average number of points that a tracker can track across the entire video per second on the DAVIS dataset in the ``First'' mode.
 
 
@@ -69,7 +69,7 @@ git https://github.com/IDEA-Research/TAPTR.git
 cd TAPTR/
 ```
 
-## Eval our pretrianed models
+## Eval our pretrained models
 Download our provided [checkpoint](https://drive.google.com/file/d/1sb4BXpCsYe6au_2a1M77tapdkodh48Rm/view?usp=share_link), and put it at "logs/TAPTR/taptr.pth"
 ```sh
 # Select the dataset you want to evaluate in evaluate.sh manually. 
