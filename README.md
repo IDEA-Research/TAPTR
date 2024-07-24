@@ -56,11 +56,11 @@ We develop and test our method under ```python=3.8.13,pytorch=1.9.1,cuda=11.1```
 ## Prepare datasets
 Construct the dataset as in [CoTracker](https://github.com/facebookresearch/co-tracker), and put it at 
 ```
-kubric data (for training): ./data/kubric_movif/
+kubric data (for training): ./datas/kubric_movif/
 tapvid data (for evaluation): 
-    ./data/tapvid/tapvid_davis
-    ./data/tapvid/tapvid_kinetics
-    ./data/tapvid/tapvid_rgb_stacking
+    ./datas/tapvid/tapvid_davis
+    ./datas/tapvid/tapvid_kinetics
+    ./datas/tapvid/tapvid_rgb_stacking
 ```
 
 ## Installation
