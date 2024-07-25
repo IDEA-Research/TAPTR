@@ -51,7 +51,7 @@ To evaluate the tracking speed of different methods fairly, we compare the Point
 As a baseline method, as shown in the tables, we provide extensive ablation studies to verify the effectiveness of each key component in TAPTR, providing references for future work.
 
 # :gear: Usage 
-We develop and test our method under ```python=3.8.13,pytorch=1.9.1,cuda=11.1```. Other versions might be available as well.
+We develop and test our method under ```python=3.8.18,pytorch=1.13.0+cu117,cuda=11.7```. Other versions might be available as well.
 
 ## Prepare datasets
 Construct the dataset as in [CoTracker](https://github.com/facebookresearch/co-tracker), and put it at 
