@@ -69,7 +69,7 @@ git https://github.com/IDEA-Research/TAPTR.git
 cd TAPTR/
 ```
 
-## Eval our pretrained models
+## Eval our trained models
 Download our provided [checkpoint](https://drive.google.com/file/d/1sb4BXpCsYe6au_2a1M77tapdkodh48Rm/view?usp=share_link), and put it at "logs/TAPTR/taptr.pth"
 ```sh
 # Select the dataset you want to evaluate in evaluate.sh manually. 
