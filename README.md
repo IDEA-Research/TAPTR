@@ -22,7 +22,7 @@ By [Hongyang Li](https://scholar.google.com.hk/citations?view_op=list_works&hl=z
 - [x] Release online demos.
 - [x] Open-source evaluation and demo code.
 - [x] Training code.
-- [ ] Clean code. (45% cleaned).
+- [ ] Clean code and requirements. (45% cleaned).
 
 
 # :scroll: Abstract
