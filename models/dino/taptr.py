@@ -113,6 +113,7 @@ class TAPTR(DINO):
             self.dropout_window_update = nn.Dropout(self.dropout_update_query_between_window)
         # class feature.
         self.mode_class_feat = mode_class_feat
+        self.memory_efficient_mode = False
 
     def prepare_video_features(self, video_data):
         """Extract the feature of the video using convolutional backbone.
@@ -350,6 +351,15 @@ class TAPTR(DINO):
         if isinstance(samples, (list, torch.Tensor)):
             samples = nested_temporal_tensor_from_tensor_list(samples)
         samples, batch_size, len_temporal = self.flatten_temporal_dimension(samples)
+        # for memory efficient inference:
+        shortest_length_for_memory_efficient = 100
+        num_of_windows_per_group = 2
+        if self.memory_efficient_mode and (len_temporal > shortest_length_for_memory_efficient):
+            self.num_frames_processed = 0
+            self.num_frames_per_group = self.sliding_window_stride * num_of_windows_per_group
+            # TODO: make sure the first group should meets the requirement of self.transformer.prepare_point_query.
+        else:
+            self.num_frames_per_group = None
         if not self.training:  # eval path
             # len_temporal = samples.tensors.shape[0]
             # Split the video into clips to lower down the usage of memory. Larger self.max_length provide faster speed.
@@ -357,19 +367,26 @@ class TAPTR(DINO):
             if len_temporal % self.max_length != 0:
                 num_sub_samples = num_sub_samples + 1
             memory = lvl_pos_embed_flatten = level_start_index = spatial_shapes = mask_flatten = valid_ratios = None
-            for sub_sample_id in range(num_sub_samples):
-                sub_samples = samples.tensors[sub_sample_id*self.max_length:(sub_sample_id+1)*self.max_length]
+            if self.memory_efficient_mode:  # split the video into multiple groups and process the video in streaming mode to save memory.
+                sub_samples = samples.tensors[self.num_frames_processed: self.num_frames_processed+self.num_frames_per_group]
+                self.num_frames_per_group = min(self.num_frames_per_group, sub_samples.shape[0])
                 sub_samples = nested_temporal_tensor_from_tensor_list([sub_samples])
                 sub_samples, _, _ = self.flatten_temporal_dimension(sub_samples)
-                sub_memory, sub_lvl_pos_embed_flatten, sub_level_start_index, sub_spatial_shapes, sub_mask_flatten, sub_valid_ratios = self.prepare_video_features(sub_samples)
-                if memory is None:
-                    memory, lvl_pos_embed_flatten, level_start_index, spatial_shapes, mask_flatten, valid_ratios = \
-                        sub_memory, sub_lvl_pos_embed_flatten, sub_level_start_index, sub_spatial_shapes, sub_mask_flatten, sub_valid_ratios
-                else:
-                    memory = torch.cat([memory, sub_memory], dim=0)
-                    lvl_pos_embed_flatten = torch.cat([lvl_pos_embed_flatten, sub_lvl_pos_embed_flatten], dim=0)
-                    mask_flatten = torch.cat([mask_flatten, sub_mask_flatten], dim=0)
-                    valid_ratios = torch.cat([valid_ratios, sub_valid_ratios], dim=0)
+                memory, lvl_pos_embed_flatten, level_start_index, spatial_shapes, mask_flatten, valid_ratios = self.prepare_video_features(sub_samples)
+            else:
+                for sub_sample_id in range(num_sub_samples):
+                    sub_samples = samples.tensors[sub_sample_id*self.max_length:(sub_sample_id+1)*self.max_length]
+                    sub_samples = nested_temporal_tensor_from_tensor_list([sub_samples])
+                    sub_samples, _, _ = self.flatten_temporal_dimension(sub_samples)
+                    sub_memory, sub_lvl_pos_embed_flatten, sub_level_start_index, sub_spatial_shapes, sub_mask_flatten, sub_valid_ratios = self.prepare_video_features(sub_samples)
+                    if memory is None:
+                        memory, lvl_pos_embed_flatten, level_start_index, spatial_shapes, mask_flatten, valid_ratios = \
+                            sub_memory, sub_lvl_pos_embed_flatten, sub_level_start_index, sub_spatial_shapes, sub_mask_flatten, sub_valid_ratios
+                    else:
+                        memory = torch.cat([memory, sub_memory], dim=0)
+                        lvl_pos_embed_flatten = torch.cat([lvl_pos_embed_flatten, sub_lvl_pos_embed_flatten], dim=0)
+                        mask_flatten = torch.cat([mask_flatten, sub_mask_flatten], dim=0)
+                        valid_ratios = torch.cat([valid_ratios, sub_valid_ratios], dim=0)
             if len_temporal > 24:  # For the updating of content features between windows.
                 self.long_video_mode = True
                 self.padding_gap = len_temporal // 24
@@ -383,7 +400,8 @@ class TAPTR(DINO):
         # Get the initial states of each point's whole trajectory. Sampling image features as point queries' initial content features and locations (inverse sigmoid). 
         ptq_current_traj_features, ptq_current_traj_embeds, ptq_current_traj_visibility = self.transformer.prepare_point_query(
             memory, lvl_pos_embed_flatten, mask_flatten, level_start_index, spatial_shapes, 
-            ptq_initial_traj_location[..., :2], ptq_initial_traj_visibility, ptq_start_tracking_frames
+            ptq_initial_traj_location[..., :2], ptq_initial_traj_visibility, ptq_start_tracking_frames,
+            len_group = self.num_frames_per_group,
         )
         #! 3. Other preparations, including the feature updating and loss.
         if (self.update_query_between_window_mode in ["mlp_delta_with_init"]):
@@ -405,11 +423,19 @@ class TAPTR(DINO):
             # Window preparation.
             self.window_id = window_id
             window_head, window_tail = self.get_window_range(window_id, len_temporal)
+            if self.memory_efficient_mode and window_tail > self.num_frames_processed + self.num_frames_per_group:
+                self.num_frames_processed = self.num_frames_processed + (self.num_frames_per_group - self.sliding_window_stride)
+                sub_samples = samples.tensors[self.num_frames_processed: self.num_frames_processed+self.num_frames_per_group]
+                self.num_frames_per_group = min(self.num_frames_per_group, sub_samples.shape[0])
+                sub_samples = nested_temporal_tensor_from_tensor_list([sub_samples])
+                sub_samples, _, _ = self.flatten_temporal_dimension(sub_samples)
+                memory, lvl_pos_embed_flatten, level_start_index, spatial_shapes, mask_flatten, valid_ratios = self.prepare_video_features(sub_samples)
             window_memory, window_lvl_pos_embed_flatten, window_mask_flatten, window_valid_ratio, \
             window_temp_attn_mask, window_self_attn_mask, window_track_mask, window_update_mask, \
             ptq_window_feature, ptq_window_embed, ptq_window_traj_corr_feature = self.prepare_window_forward(
-                batch_size, len_temporal,
-                window_head, window_tail,
+                batch_size, len_temporal if not self.memory_efficient_mode else self.num_frames_per_group,
+                window_head if not self.memory_efficient_mode else window_head - self.num_frames_processed, 
+                window_tail if not self.memory_efficient_mode else window_tail - self.num_frames_processed, 
                 ptq_start_tracking_frames, ptq_tracking_masks, ptq_updating_masks, 
                 memory, lvl_pos_embed_flatten, mask_flatten, valid_ratios,
                 ptq_current_traj_features, 
@@ -483,6 +509,7 @@ class TAPTR(DINO):
                 target["ptq_update_mask"] = ptq_update_mask
                 full_seq_targets.append(target)
         
+        self.num_frames_processed = 0
         outputs = {
             "full_seq_output": full_seq_output,
             "window_output_list": window_output_list,

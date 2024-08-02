@@ -64,8 +64,9 @@ class Demo():
         # TODO: process video using model.
         n_frames, height, width = video.shape[:3]  # video.shape[2], video.shape[1]
         if n_frames > 700:
-            print("\nError, Too long video!"*10)
-            return None
+            print("\nWarning, Too long video, clipping to 700 frames!"*10)
+            video = video[:700]
+            # return None
         video = torch.FloatTensor(video)
         input_video = torch.FloatTensor(resize_video(video.cpu().numpy(), (512, 512))).permute(0,3,1,2)
         points = np.array(points)[..., :2] / np.array([[width, height]]) * 512
@@ -387,7 +388,8 @@ def video_to_interaction(input_video, frame_selector):
         frame_selector (_type_): _description_
         interaction (_type_): _description_
     """
-    frame_selector = int(700 * frame_selector)
+    # frame_selector = int(700 * frame_selector)
+    frame_selector = int(frame_selector)
     frames = cv2.VideoCapture(input_video)
     interaction = None
     # fps = int(frames.get(cv2.CAP_PROP_FPS))
@@ -453,6 +455,10 @@ with gr.Blocks(title="TAPTR") as demo:
     """)
     notation = ("""
         💡Since TAPTR is a general point tracking method, feel free to upload and evaluate your own video. 
+        
+        💡To alleviate our computational load, if the length of your input video exceeds 700 frames, we will clamp the video to 700 frames.
+                
+        💡The frame selector can not adjust the range automatically, if the selected frame exceed the video length, the demo will fail. 
     """)
     gr.Markdown(title_markdown)
     with gr.Row():
@@ -479,7 +485,7 @@ with gr.Blocks(title="TAPTR") as demo:
                 usage_video = gr.Video(label="Usage", height=250, value="./assets/PointTracking.mp4")
                 gr.Markdown(tips)
         with gr.Column():
-            interaction = ImagePrompter(label="Interaction", interactive=True, height=600)
+            interaction = ImagePrompter(label="Interaction", interactive=True, height=700)
             output_video = gr.Video(label="Output Video", height=650)
     input_video.change(fn=video_to_interaction, inputs=[input_video, frame_selector], outputs=[interaction])
     frame_selector.change(fn=video_to_interaction, inputs=[input_video, frame_selector], outputs=[interaction])

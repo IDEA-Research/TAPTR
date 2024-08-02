@@ -200,7 +200,7 @@ class PointDeformableTransformer(DeformableTransformer):
         #########################################################        
         return hs, references, hs_enc, ref_enc
     
-    def prepare_point_query(self, flattened_multi_scale_features, flattened_multi_scale_pos_enc, flattened_multi_scale_mask, level_start_index, multi_scale_spatial_shapes, pt_refpoint, pt_tgt, first_emerge_frame=None):
+    def prepare_point_query(self, flattened_multi_scale_features, flattened_multi_scale_pos_enc, flattened_multi_scale_mask, level_start_index, multi_scale_spatial_shapes, pt_refpoint, pt_tgt, first_emerge_frame=None, len_group=None):
         """prepare the initial feature of each points according to the "query_feature_initialize_mode".
             These features are supported: first_frame_feature_bilinear, first_frame_pe_bilinear, initial_pe, initial_visib.
             Please refer to the docstring of the class for more detail.
@@ -239,11 +239,13 @@ class PointDeformableTransformer(DeformableTransformer):
             return features_first_emerge_frame
         
         bs, len_temp = pt_refpoint.shape[:2]
+        if len_group is None:
+            len_group = len_temp
         pt_features = []
         for init_feature_mode in self.query_feature_initialize_mode:
             if init_feature_mode == "first_emerge_frame_ms_feature_bilinear":
                 for spatial_shape, start_index in zip(multi_scale_spatial_shapes, level_start_index):
-                    feature_maps = flattened_multi_scale_features[:, start_index: start_index+spatial_shape.prod()].view(bs, len_temp, *spatial_shape, -1).permute(0,1,4,2,3)  # bs len_temp h w c
+                    feature_maps = flattened_multi_scale_features[:, start_index: start_index+spatial_shape.prod()].view(bs, len_group, *spatial_shape, -1).permute(0,1,4,2,3)  # bs len_temp h w c
                     sampling_loc_3d = torch.cat([first_emerge_frame[..., None], pt_refpoint[:,0] * (spatial_shape-1)], dim=-1)[:,None]
                     pt_local_feature_lvl = sample_features5d(feature_maps, sampling_loc_3d)  # bs 1 num_point C
                     pt_features.append(pt_local_feature_lvl.squeeze(1))
