@@ -230,10 +230,10 @@ class TAPTR(DINO):
         if window_update_mask.sum() == 0:  # none of the points should be updated in the window.
             return [None, ] * 11
         # construct temporal attention mask in the window.
-        window_memory = memory.view(batchsize, len_temporal, *memory.shape[1:])[:, window_head:window_tail+1].flatten(0,1)
-        window_lvl_pos_embed_flatten = lvl_pos_embed_flatten.view(batchsize, len_temporal, *lvl_pos_embed_flatten.shape[1:])[:, window_head:window_tail+1].flatten(0,1)
-        window_mask_flatten = mask_flatten.view(batchsize, len_temporal, *mask_flatten.shape[1:])[:, window_head:window_tail+1].flatten(0,1)
-        window_valid_ratios = valid_ratios.view(batchsize, len_temporal, *valid_ratios.shape[1:])[:, window_head:window_tail+1].flatten(0,1)
+        window_memory = memory.view(batchsize, len_temporal, *memory.shape[1:])[:, window_head-self.num_frames_processed:window_tail+1-self.num_frames_processed].flatten(0,1)
+        window_lvl_pos_embed_flatten = lvl_pos_embed_flatten.view(batchsize, len_temporal, *lvl_pos_embed_flatten.shape[1:])[:, window_head-self.num_frames_processed:window_tail+1-self.num_frames_processed].flatten(0,1)
+        window_mask_flatten = mask_flatten.view(batchsize, len_temporal, *mask_flatten.shape[1:])[:, window_head-self.num_frames_processed:window_tail+1-self.num_frames_processed].flatten(0,1)
+        window_valid_ratios = valid_ratios.view(batchsize, len_temporal, *valid_ratios.shape[1:])[:, window_head-self.num_frames_processed:window_tail+1-self.num_frames_processed].flatten(0,1)
 
         # n_head_temp_self_attn = self.transformer.decoder.layers[0].temp_self_attn.num_heads if not (self.transformer.decoder.layers[0].temp_self_attn is None) else 8
         if not (self.transformer.decoder.layers[0].temp_self_attn is None):
@@ -354,11 +354,12 @@ class TAPTR(DINO):
         # for memory efficient inference:
         shortest_length_for_memory_efficient = 100
         num_of_windows_per_group = 2
-        if self.memory_efficient_mode and (len_temporal > shortest_length_for_memory_efficient):
+        if self.memory_efficient_mode:
             self.num_frames_processed = 0
             self.num_frames_per_group = self.sliding_window_stride * num_of_windows_per_group
             # TODO: make sure the first group should meets the requirement of self.transformer.prepare_point_query.
         else:
+            self.num_frames_processed = 0
             self.num_frames_per_group = None
         if not self.training:  # eval path
             # len_temporal = samples.tensors.shape[0]
@@ -423,8 +424,8 @@ class TAPTR(DINO):
             # Window preparation.
             self.window_id = window_id
             window_head, window_tail = self.get_window_range(window_id, len_temporal)
-            if self.memory_efficient_mode and window_tail > self.num_frames_processed + self.num_frames_per_group:
-                self.num_frames_processed = self.num_frames_processed + (self.num_frames_per_group - self.sliding_window_stride)
+            if self.memory_efficient_mode and window_tail > (self.num_frames_processed + self.num_frames_per_group - 1):
+                self.num_frames_processed = window_head
                 sub_samples = samples.tensors[self.num_frames_processed: self.num_frames_processed+self.num_frames_per_group]
                 self.num_frames_per_group = min(self.num_frames_per_group, sub_samples.shape[0])
                 sub_samples = nested_temporal_tensor_from_tensor_list([sub_samples])
@@ -434,8 +435,8 @@ class TAPTR(DINO):
             window_temp_attn_mask, window_self_attn_mask, window_track_mask, window_update_mask, \
             ptq_window_feature, ptq_window_embed, ptq_window_traj_corr_feature = self.prepare_window_forward(
                 batch_size, len_temporal if not self.memory_efficient_mode else self.num_frames_per_group,
-                window_head if not self.memory_efficient_mode else window_head - self.num_frames_processed, 
-                window_tail if not self.memory_efficient_mode else window_tail - self.num_frames_processed, 
+                window_head, 
+                window_tail, 
                 ptq_start_tracking_frames, ptq_tracking_masks, ptq_updating_masks, 
                 memory, lvl_pos_embed_flatten, mask_flatten, valid_ratios,
                 ptq_current_traj_features, 
