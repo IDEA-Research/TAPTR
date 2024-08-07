@@ -68,7 +68,7 @@ tapvid data (for evaluation):
 
 ## Installation
 ```sh
-git https://github.com/IDEA-Research/TAPTR.git
+git clone https://github.com/IDEA-Research/TAPTR.git
 cd TAPTR
 pip install -r requirements.txt
 cd models/dino/ops
