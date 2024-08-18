@@ -3,7 +3,7 @@
 By [Hongyang Li](https://scholar.google.com.hk/citations?view_op=list_works&hl=zh-CN&user=zdgHNmkAAAAJ&gmla=AMpAcmTJNHoetv6zgfzZkIRcYsFr0UkGGDyl5tAp5etuBqhz3lzYZCQrVDot02xVQ1XTbnMS1fPdAfe0-2--aTXOtewokjyShNLOQQyyhtkolwaz0hvENZpi-pJ-Wg), [Hao Zhang](https://scholar.google.com/citations?user=B8hPxMQAAAAJ&hl=zh-CN), [Shilong Liu](https://scholar.google.com/citations?hl=zh-CN&user=nkSVY3MAAAAJ), [Zhaoyang Zeng](https://scholar.google.com.hk/citations?user=U_cvvUwAAAAJ&hl=zh-CN&oi=sra), [Tianhe Ren](https://scholar.google.com.hk/citations?user=cW4ILs0AAAAJ&hl=zh-CN&oi=sra), [Feng Li](https://scholar.google.com.hk/citations?user=ybRe9GcAAAAJ&hl=zh-CN&oi=sra), and [Lei Zhang](https://scholar.google.com/citations?hl=zh-CN&user=fIlGZToAAAAJ) <sup>:email:</sup>.
 
 ### [Project Page](https://taptr.github.io) | [Demo-PointTrajectory](https://taptr-trajectory.deepdataspace.com) | [Demo-TrackAnyArea](https://taptr-videoediting.deepdataspace.com)
-### [Arxiv-TAPTR](https://arxiv.org/abs/2403.13042) | [Arxiv-TAPTRv2](https://arxiv.org/abs/2403.13042) | [BibTeX](#citing-taptr)
+### [Arxiv-TAPTR](https://arxiv.org/abs/2403.13042) | [Arxiv-TAPTRv2](https://arxiv.org/abs/2407.16291) | [BibTeX](#citing-taptr)
 [![VideoEdit_PointTrajectory](assets/combine_video_coverimage.png)](https://github.com/IDEA-Research/TAPTR/assets/89394032/036503fe-bb4c-4804-affc-c606fd93878f)
 
 # :fire: News
