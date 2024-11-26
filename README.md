@@ -10,7 +10,7 @@ These works are completed by [Hongyang Li](https://scholar.google.com.hk/citatio
 
 # :fire: News
 
-[2024/11/26] We release our TAPTRv3 paper.
+[2024/11/27] We release our TAPTRv3 paper.
 
 [2024/11/25] TAPTRv2's code is released.
 
@@ -25,7 +25,7 @@ These works are completed by [Hongyang Li](https://scholar.google.com.hk/citatio
 [2024/3/15] We release our TAPTRv1 paper.
 
 
-# What is TAPTR.
+# :dna: What is TAPTR.
 Inspired by recent visual prompt-based detection [1], we propose to convert Track Any Point (TAP) task to point-level visual prompt detection task. Building upon the recent advanced DEtection TRansformer (DETR) [2, 3, 4, 5], we propose our Track Any Point TRansformer (TAPTR).
 
 [1] T-rex2: Towards Generic Object Detection via Text-visual Prompt Synergy. IDEA-Research. ECCV2024.
@@ -38,7 +38,7 @@ Inspired by recent visual prompt-based detection [1], we propose to convert Trac
 
 [5] DINO-X: A Unified Vision Model for Open-World Object Detection and Understanding. IDEA-Research. ArXiv2024.
 
-# From V1 to V3, a breif overview.
+# :footprints: From V1 to V3, a brief overview.
 
 ### TAPTRv1 - Simple yet strong baseline.
 TAPTRv1 first proposes to address TAP task from the perspective of detection. Instead of building upon the traditional optical flow methods, TAPTRv1 is also the first propose to adopt the more advanced DETR-like framework for TAP task. Compared with previous methods, TAPTRv1 has a clearer and simpler definition of point query and better performance.
@@ -68,7 +68,7 @@ TAPTRv3 finds that the poor performance of TAPTRv2 on long videos is due to its 
 
 
 
-# Future work and collaboration opportunities.
+# :calendar_spiral: Future work and collaboration opportunities.
 1. Extend TAPTR to Track Any Visual Prompt TRansformer (TAVTR).
 2. Exploring the application of TAPTR in embodied AI scenarios.
 
