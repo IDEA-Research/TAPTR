@@ -78,7 +78,7 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
 # :black_nib: Citation
 
 ```
-@article{li2024taptrv3,
+@article{li2024taptrv2,
   title={{TAPTRv2: Attention-based Position Update Improves Tracking Any Point}},
   author={Hongyang Li, Hao Zhang, Shilong Liu, Zhaoyang Zeng, Feng Li, Tianhe Ren, Bohan Li, Lei Zhang},
   journal={Advances in Neural Information Processing Systems},
