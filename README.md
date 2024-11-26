@@ -93,10 +93,12 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
 # :black_nib: Citation
 
 ```
-@inproceedings{
-  title={TAPTR: Tracking Any Point with Transformers as Detection},
-  author={Hongyang Li and Hao Zhang and Shilong Liu and Zhaoyang Zeng and Tianhe Ren and Feng Li and Lei Zhang},
-  booktitle={Proceedings of the IEEE/CVF European Conference on Computer Vision},
-  year={2024}
+@inproceedings{li2024taptr,
+  title={{TAPTR: Tracking Any Point with Transformers as Detection}},
+  author={Li, Hongyang and Zhang, Hao and Liu, Shilong and Zeng, Zhaoyang and Ren, Tianhe and Li, Feng and Zhang, Lei},
+  booktitle={European Conference on Computer Vision},
+  pages={57--75},
+  year={2025},
+  organization={Springer}
 }
 ```
