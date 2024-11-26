@@ -99,11 +99,4 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
   booktitle={Proceedings of the IEEE/CVF European Conference on Computer Vision},
   year={2024}
 }
-@inproceedings{
-  title={TAPTRv2: Attention-based Position Update Improves Tracking Any Point},
-  author={Hongyang Li and Hao Zhang and Shilong Liu and Zhaoyang Zeng and Feng Li and Tianhe Ren and Bohan Li and Lei Zhang},
-  journal={arXiv preprint arXiv:2407.16291
-  },
-  year={2024}
-}
 ```
