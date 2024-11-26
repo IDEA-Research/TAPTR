@@ -68,7 +68,7 @@ TAPTRv3 finds that the poor performance of TAPTRv2 on long videos is due to its 
 
 
 
-# :calendar_spiral: Future work and collaboration opportunities.
+# :calendar: Future work and collaboration opportunities.
 1. Extend TAPTR to Track Any Visual Prompt TRansformer (TAVTR).
 2. Exploring the application of TAPTR in embodied AI scenarios.
 
