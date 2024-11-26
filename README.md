@@ -58,7 +58,7 @@ _Although TAPTRv2 achieves simpler framework and better performance, TAPTRv2’s
   <img src="assets/TAPTRv2.png" alt="TAPTRv2" width="90%">
 </div>
 
-### TAPTRv3 - Strongest TAP model.
+### TAPTRv3 - Much stronger, especially on long-term tracking.
 TAPTRv3 finds that the poor performance of TAPTRv2 on long videos is due to its shortage of feature querying in both spatial and temporal dimensions in long videos. For __better temporal feature querying__, instead of utilizing the RNN-like long-temporal modeling, TAPTRv3 extends the temporal attention from a small window to arbitrary length while considering the target tracking points' visibility, and proposes the __Visibility-aware Long-Temporal Attention__ (VLTA). For __better spatial feature querying__, TAPTRv3 utilizes the spatial context to improve the quality of attention weights in cross attention, and proposes the __Context-aware Cross Attention__ (CCA). To help TAPTRv3 reestablish tracking when a scene cut occurs with sudden large motion, which is quite prevalent in long-term videos, TAPTRv3 proposes to __trigger global matching module to reset point queries' initial locations when a scene cut is detected__. __TAPTRv3 achieves SoTA performance on almost all TAP datasets, even when compared with methods trained on large-scale extra internal data, TAPTRv3 is still competitive.__
 
 <div align="center">
