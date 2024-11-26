@@ -41,7 +41,7 @@ Inspired by recent visual prompt-based detection [1], we propose to convert Trac
 # :footprints: From V1 to V3, a brief overview.
 
 ### TAPTRv1 - Simple yet strong baseline.
-TAPTRv1 first proposes to address TAP task from the perspective of detection. Instead of building upon the traditional optical flow methods, TAPTRv1 is also the first propose to adopt the more advanced DETR-like framework for TAP task. Compared with previous methods, TAPTRv1 has a clearer and simpler definition of point query and better performance.
+TAPTRv1 first proposes to address TAP task __from the perspective of detection__. Instead of building upon the traditional optical flow methods, TAPTRv1 is also the first propose to adopt the more advanced DETR-like framework for TAP task. Compared with previous methods, TAPTRv1 has a __clearer and simpler definition of point query and better performance__.
 
 _Although TAPTRv1 achieves SoTA performance with the DETR-like framework, TAPTRv1 still needs the source-consuming cost-volume to obtain its optimal performance._
 
@@ -58,7 +58,7 @@ _Although TAPTRv2 achieves simpler framework and better performance, TAPTRv2’s
   <img src="assets/TAPTRv2.png" alt="TAPTRv2" width="90%">
 </div>
 
-### TAPTRv3 - Much simpler and stronger.
+### TAPTRv3 - Strongest TAP model.
 TAPTRv3 finds that the poor performance of TAPTRv2 on long videos is due to its shortage of feature querying in both spatial and temporal dimensions in long videos. For __better temporal feature querying__, instead of utilizing the RNN-like long-temporal modeling, TAPTRv3 extends the temporal attention from a small window to arbitrary length while considering the target tracking points' visibility, and proposes the __Visibility-aware Long-Temporal Attention__ (VLTA). For __better spatial feature querying__, TAPTRv3 utilizes the spatial context to improve the quality of attention weights in cross attention, and proposes the __Context-aware Cross Attention__ (CCA). To help TAPTRv3 reestablish tracking when a scene cut occurs with sudden large motion, which is quite prevalent in long-term videos, TAPTRv3 proposes to __trigger global matching module to reset point queries' initial locations when a scene cut is detected__. __TAPTRv3 achieves SoTA performance on almost all TAP datasets, even when compared with methods trained on large-scale extra internal data, TAPTRv3 is still competitive.__
 
 <div align="center">
@@ -66,7 +66,13 @@ TAPTRv3 finds that the poor performance of TAPTRv2 on long videos is due to its 
 </div>
 
 
+# :100: Performance
 
+<div align="center">
+  <img src="assets/performance.png" alt="performance" width="80%">
+</div>
+
+Through three versions of optimization, TAPTRv3 achieves state-of-the-art performance. Even when compared with methods trained on large-scale extra internal data (we only train TAPTRv3 on a small synthetic dataset, while BootsTAPIR and CoTracker3 are refined on their large-scale internal real-world dataset), TAPTRv3 is still competitive.
 
 # :spiral_calendar: Future work and collaboration opportunities.
 1. Extend TAPTR to Track Any Visual Prompt TRansformer (TAVTR).
@@ -86,7 +92,7 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
   author={Li, Hongyang and Zhang, Hao and Liu, Shilong and Zeng, Zhaoyang and Ren, Tianhe and Li, Feng and Zhang, Lei},
   booktitle={European Conference on Computer Vision},
   pages={57--75},
-  year={2025},
+  year={2024},
   organization={Springer}
 }
 @article{li2024taptrv2
