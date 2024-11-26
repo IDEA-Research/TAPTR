@@ -19,14 +19,6 @@ By [Hongyang Li](https://scholar.google.com.hk/citations?view_op=list_works&hl=z
 [2024/3/15] We release our paper.
 
 
-
-# :spiral_calendar: TODO List
-- [x] Release paper.
-- [x] Release online demos.
-- [x] Open-source evaluation and demo code.
-- [x] Training code.
-
-
 # :scroll: Abstract
 In this paper, we propose a simple and strong framework for **T**racking **A**ny **P**oint with **TR**ansformer (**TAPTR**). Based on the observation that point tracking bears a great resemblance to object detection and tracking, we borrow designs from DETR-like algorithms to address the task of TAP. In the proposed framework, each tracking point is represented as a DETR query, which consists of a positional part and a content part. As in DETR, each query (its position and content feature) is naturally updated layer by layer. Its visibility is predicted by its updated content feature. Queries belonging to the same tracking point can exchange information through temporal self-attention. As all such operations are well-designed in DETR-like algorithms, the model is conceptually very simple.  We also adopt some useful designs such as cost volume from optical flow models and develop simple designs to mitigate the feature drifting issue. Our framework demonstrates strong performance with state-of-the-art performance on various TAP datasets with faster inference speed. 
 
