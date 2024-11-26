@@ -410,7 +410,6 @@ def main(args):
     if not args.eval_checkpoint:
         args.eval_checkpoint = os.path.join(args.output_dir, 'checkpoint.pth')
     checkpoint = torch.load(args.eval_checkpoint, map_location='cpu')
-    epoch = checkpoint['epoch']
     model.to(device)
     model.eval()
     print("loading checkpoint from {}".format(args.eval_checkpoint))
