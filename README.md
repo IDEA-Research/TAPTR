@@ -46,6 +46,7 @@ tapvid data (for evaluation):
 ```sh
 git https://github.com/IDEA-Research/TAPTR.git
 cd TAPTR
+git checkout v2
 pip install -r requirements.txt
 cd models/dino/ops
 python setup.py install # This compilation requires nvcc, please make sure you have installed CUDA correctly. CUDA11.7 is tested.
