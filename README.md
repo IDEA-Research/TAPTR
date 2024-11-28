@@ -101,7 +101,7 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
   journal={Advances in Neural Information Processing Systems},
   year={2024}
 }
-@article{li2024taptrv3,
+@article{Qu2024taptrv3,
   title={{TAPTRv3: Spatial and Temporal Context Foster Robust Tracking of Any Point in Long Video}},
   author={Jinyuan Qu, Hongyang Li, Shilong Liu, Tianhe Ren, Zhaoyang Zeng, Lei Zhang},
   journal={arXiv preprint},
