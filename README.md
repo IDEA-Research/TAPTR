@@ -4,7 +4,7 @@ We open-source TAPTRv1, TAPTRv2, and TAPTRv3 (not yet) in this repository. You c
 
 These works are completed by [Hongyang Li](https://scholar.google.com.hk/citations?view_op=list_works&hl=zh-CN&user=zdgHNmkAAAAJ&gmla=AMpAcmTJNHoetv6zgfzZkIRcYsFr0UkGGDyl5tAp5etuBqhz3lzYZCQrVDot02xVQ1XTbnMS1fPdAfe0-2--aTXOtewokjyShNLOQQyyhtkolwaz0hvENZpi-pJ-Wg), [Jinyuan Qu](https://scholar.google.com/citations?user=-RSeOl0AAAAJ&hl=zh-CN), [Hao Zhang](https://scholar.google.com/citations?user=B8hPxMQAAAAJ&hl=zh-CN), [Shilong Liu](https://scholar.google.com/citations?hl=zh-CN&user=nkSVY3MAAAAJ), [Zhaoyang Zeng](https://scholar.google.com.hk/citations?user=U_cvvUwAAAAJ&hl=zh-CN&oi=sra), [Tianhe Ren](https://scholar.google.com.hk/citations?user=cW4ILs0AAAAJ&hl=zh-CN&oi=sra), [Feng Li](https://scholar.google.com.hk/citations?user=ybRe9GcAAAAJ&hl=zh-CN&oi=sra), [Bohan Li](https://scholar.google.com.hk/citations?hl=zh-CN&user=V-YdQiAAAAAJ) and [Lei Zhang](https://scholar.google.com/citations?hl=zh-CN&user=fIlGZToAAAAJ) <sup>:email:</sup>.
 
-### Paper Links: [TAPTRv1](https://arxiv.org/pdf/2403.13042) | [TAPTRv2](https://arxiv.org/abs/2407.16291) | [TAPTRv3](xxx)
+### Paper Links: [TAPTRv1](https://arxiv.org/pdf/2403.13042) | [TAPTRv2](https://arxiv.org/abs/2407.16291) | [TAPTRv3](https://github.com/IDEA-Research/TAPTR/blob/v3/TAPTRv3.pdf)
 ### More Links: [TAPTR Project Page](https://taptr.github.io) | [BibTeX](#citing-taptr) | [IDEA-Research](https://github.com/IDEA-Research)
 
 
