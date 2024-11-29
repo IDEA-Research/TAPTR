@@ -89,7 +89,7 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
 ```
 @inproceedings{li2024taptr,
   title={{TAPTR: Tracking Any Point with Transformers as Detection}},
-  author={Li Hongyang, Zhang Hao, Liu Shilong, Zeng Zhaoyang, Ren Tianhe, Li Feng, Zhang Lei},
+  author={Li, Hongyang and Zhang, Hao and Liu, Shilong and Zeng, Zhaoyang and Ren, Tianhe and Li, Feng and Zhang, Lei},
   booktitle={European Conference on Computer Vision},
   pages={57--75},
   year={2024},
@@ -97,13 +97,13 @@ We would like to thank [TAP-Vid](https://github.com/google-deepmind/tapnet) and 
 }
 @article{li2024taptrv2
   title={{TAPTRv2: Attention-based Position Update Improves Tracking Any Point}},
-  author={Hongyang Li, Hao Zhang, Shilong Liu, Zhaoyang Zeng, Feng Li, Tianhe Ren, Bohan Li, Lei Zhang},
+  author={Li, Hongyang and Zhang, Hao and Liu, Shilong and Zeng, Zhaoyang and Li, Feng and Ren, Tianhe and Li, Bohan and Zhang, Lei},
   journal={Advances in Neural Information Processing Systems},
   year={2024}
 }
 @article{Qu2024taptrv3,
   title={{TAPTRv3: Spatial and Temporal Context Foster Robust Tracking of Any Point in Long Video}},
-  author={Jinyuan Qu, Hongyang Li, Shilong Liu, Tianhe Ren, Zhaoyang Zeng, Lei Zhang},
+  author={Qu, Jinyuan and Li, Hongyang and Liu, Shilong and Zeng, Zhaoyang and Ren, Tianhe and Zhang, Lei},
   journal={arXiv preprint},
   year={2024}
 }
