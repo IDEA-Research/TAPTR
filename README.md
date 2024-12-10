@@ -68,7 +68,7 @@ python setup.py install # This compilation requires nvcc, please make sure you h
 ```
 
 ## Eval our trained models
-Download our provided [checkpoint](https://drive.google.com/file/d/1iJ0FFpgDeTGsn7qTnpTJ731Uy9tssjSW/view?usp=share_link), and put it at "logs/TAPTR/taptr.pth"
+Download our provided [checkpoint](https://huggingface.co/HYeungLee/TAPTR-Series/resolve/main/taptrv1.pth), and put it at "logs/TAPTR/taptr.pth"
 ```sh
 # Select the dataset you want to evaluate in evaluate.sh manually. 
 bash evaluate.sh
