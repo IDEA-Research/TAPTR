@@ -10,6 +10,8 @@ These works are completed by [Hongyang Li](https://scholar.google.com.hk/citatio
 
 # :fire: News
 
+[2026/1/26] TAPTRv3 is accepted by ICLR2026.
+
 [2024/11/28] We release our TAPTRv3 paper.
 
 [2024/11/25] TAPTRv2's code is released.
