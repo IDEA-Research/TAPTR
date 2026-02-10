@@ -44,7 +44,7 @@ tapvid data (for evaluation):
 
 ## Installation
 ```sh
-git https://github.com/IDEA-Research/TAPTR.git
+git clone https://github.com/IDEA-Research/TAPTR.git
 cd TAPTR
 git checkout v2
 pip install -r requirements.txt
