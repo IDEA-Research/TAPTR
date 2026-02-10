@@ -18,12 +18,9 @@ logs
 models/dino/ops/build/
 models/dino/ops/*.egg-info/
 models/dino/ops/dist/
-vis_results
 datas
-saved_videos
-checkpoint/*.pth
-checkpoints
 *.tar.gz
 *.mp4
 *.gif
+*.pth
 checkpoints
